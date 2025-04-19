@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { predictDisease } from '@/utils/predictionAlgorithm';
 import { useToast } from '@/hooks/use-toast';
 import ComparisonModal from '@/components/ComparisonModal';
-import { ChartComparison } from 'lucide-react';
+import { BarChart2 } from 'lucide-react';
 
 const Index = () => {
   const [selectedSymptoms, setSelectedSymptoms] = useState<number[]>([]);
@@ -86,7 +86,7 @@ const Index = () => {
                   onClick={() => setIsComparisonOpen(true)}
                   className="w-full sm:w-auto"
                 >
-                  <ChartComparison className="mr-2 h-4 w-4" />
+                  <BarChart2 className="mr-2 h-4 w-4" />
                   Compare Results
                 </Button>
               )}

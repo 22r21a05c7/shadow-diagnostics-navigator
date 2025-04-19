@@ -65,9 +65,9 @@ const ComparisonModal: React.FC<ComparisonModalProps> = ({
                 ))}
               </TableRow>
               <TableRow>
-                <TableCell className="font-medium">Prevention</TableCell>
+                <TableCell className="font-medium">Lifestyle</TableCell>
                 {diseases.map((d) => (
-                  <TableCell key={d.disease.id}>{d.disease.prevention}</TableCell>
+                  <TableCell key={d.disease.id}>{d.disease.lifestyle}</TableCell>
                 ))}
               </TableRow>
             </TableBody>
