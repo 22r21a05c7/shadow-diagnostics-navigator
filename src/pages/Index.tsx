@@ -1,12 +1,91 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React, { useState, useEffect } from 'react';
+import Header from '@/components/Header';
+import SymptomSelector from '@/components/SymptomSelector';
+import DiseaseResults from '@/components/DiseaseResults';
+import Footer from '@/components/Footer';
+import { Button } from '@/components/ui/button';
+import { predictDisease } from '@/utils/predictionAlgorithm';
+import { useToast } from '@/components/ui/use-toast';
 
 const Index = () => {
+  const [selectedSymptoms, setSelectedSymptoms] = useState<number[]>([]);
+  const [results, setResults] = useState([]);
+  const [hasRun, setHasRun] = useState(false);
+  const { toast } = useToast();
+
+  // Run prediction whenever symptoms change and we have at least one symptom
+  useEffect(() => {
+    if (selectedSymptoms.length > 0 && hasRun) {
+      runPrediction();
+    }
+  }, [selectedSymptoms]);
+
+  const runPrediction = () => {
+    if (selectedSymptoms.length === 0) {
+      toast({
+        title: "No symptoms selected",
+        description: "Please select at least one symptom to get a prediction",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setHasRun(true);
+    const predictionResults = predictDisease(selectedSymptoms);
+    setResults(predictionResults);
+
+    if (selectedSymptoms.length < 3) {
+      toast({
+        title: "Limited symptoms",
+        description: "For more accurate results, please select at least 3 symptoms",
+        variant: "default",
+      });
+    } else if (predictionResults.length === 0) {
+      toast({
+        title: "No matches found",
+        description: "No diseases matched your symptom combination. Try different symptoms.",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Prediction complete",
+        description: `Found ${predictionResults.length} potential matches based on your symptoms`,
+        variant: "default",
+      });
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
+      <Header />
+      
+      <main className="flex-grow container mx-auto py-6 px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <SymptomSelector 
+              selectedSymptoms={selectedSymptoms} 
+              setSelectedSymptoms={setSelectedSymptoms} 
+            />
+            
+            <div className="flex justify-center">
+              <Button 
+                onClick={runPrediction} 
+                size="lg"
+                className="w-full sm:w-auto"
+              >
+                Analyze Symptoms
+              </Button>
+            </div>
+          </div>
+          
+          <div>
+            <DiseaseResults results={results} />
+          </div>
+        </div>
+      </main>
+      
+      <Footer />
     </div>
   );
 };
