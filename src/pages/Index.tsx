@@ -6,12 +6,15 @@ import DiseaseResults from '@/components/DiseaseResults';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { predictDisease } from '@/utils/predictionAlgorithm';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import ComparisonModal from '@/components/ComparisonModal';
+import { ChartComparison } from 'lucide-react';
 
 const Index = () => {
   const [selectedSymptoms, setSelectedSymptoms] = useState<number[]>([]);
   const [results, setResults] = useState([]);
   const [hasRun, setHasRun] = useState(false);
+  const [isComparisonOpen, setIsComparisonOpen] = useState(false);
   const { toast } = useToast();
 
   // Run prediction whenever symptoms change and we have at least one symptom
@@ -68,7 +71,7 @@ const Index = () => {
               setSelectedSymptoms={setSelectedSymptoms} 
             />
             
-            <div className="flex justify-center">
+            <div className="flex justify-center gap-4">
               <Button 
                 onClick={runPrediction} 
                 size="lg"
@@ -76,6 +79,17 @@ const Index = () => {
               >
                 Analyze Symptoms
               </Button>
+              {results.length > 1 && (
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setIsComparisonOpen(true)}
+                  className="w-full sm:w-auto"
+                >
+                  <ChartComparison className="mr-2 h-4 w-4" />
+                  Compare Results
+                </Button>
+              )}
             </div>
           </div>
           
@@ -84,6 +98,12 @@ const Index = () => {
           </div>
         </div>
       </main>
+      
+      <ComparisonModal
+        diseases={results}
+        open={isComparisonOpen}
+        onOpenChange={setIsComparisonOpen}
+      />
       
       <Footer />
     </div>
