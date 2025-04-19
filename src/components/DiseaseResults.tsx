@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Disease } from '../data/diseases';
 import {
@@ -18,7 +17,10 @@ import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, ThumbsUp } from 'lucide-react';
+import { AlertCircle, ThumbsUp, Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { pdf } from '@react-pdf/renderer';
+import DiseaseReport from './DiseaseReport';
 
 interface DiseaseWithProbability {
   disease: Disease;
@@ -36,6 +38,22 @@ const DiseaseResults: React.FC<DiseaseResultsProps> = ({ results }) => {
 
   // Find the selected disease details
   const selectedDisease = results.find(item => item.disease.id === selectedDiseaseId);
+
+  const downloadReport = async () => {
+    try {
+      const blob = await pdf(<DiseaseReport results={results} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'disease-prediction-report.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  };
 
   if (results.length === 0) {
     return (
@@ -61,10 +79,20 @@ const DiseaseResults: React.FC<DiseaseResultsProps> = ({ results }) => {
   return (
     <Card className="bg-card border-border">
       <CardHeader>
-        <CardTitle>Disease Prediction Results</CardTitle>
-        <CardDescription>
-          Based on your symptoms, here are the possible conditions
-        </CardDescription>
+        <div className="flex justify-between items-center">
+          <div>
+            <CardTitle>Disease Prediction Results</CardTitle>
+            <CardDescription>
+              Based on your symptoms, here are the possible conditions
+            </CardDescription>
+          </div>
+          {results.length > 0 && (
+            <Button variant="outline" size="sm" onClick={downloadReport}>
+              <Download className="h-4 w-4 mr-2" />
+              Download Report
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="p-0">
         <div className="grid grid-cols-1 md:grid-cols-3 h-[500px]">
